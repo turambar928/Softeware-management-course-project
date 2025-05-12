@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+
+.idea/
+
+app/resource/
+config.py
+app/static/news/*.png
+app/static/news/*.jpg
+
