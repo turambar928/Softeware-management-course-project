@@ -46,7 +46,9 @@
     </div>
 
     <div class="quick-actions">
-      <h3>快速操作</h3>
+      <div class="section-header">
+        <h3>快速操作</h3>
+      </div>
       <el-row :gutter="20">
         <el-col :span="8">
           <el-card class="action-card" @click="navigateTo('news-detection')">
@@ -176,7 +178,7 @@ onMounted(() => {
 
 <style scoped>
 .dashboard {
-  padding: 0;
+  padding: 20px 10px;
 }
 
 .welcome-section {
@@ -226,12 +228,18 @@ onMounted(() => {
 }
 
 .quick-actions {
-  margin-bottom: 30px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .quick-actions h3, .recent-detections h3 {
-  margin-bottom: 15px;
+  margin-top: 10px;
+  margin-bottom: 20px;
   font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  padding-left: 10px;
+  border-left: 3px solid var(--secondary-color);
 }
 
 .action-card {
@@ -268,10 +276,13 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .recent-detections {
-  margin-bottom: 20px;
+  margin-top: 40px;
+  margin-bottom: 30px;
 }
 </style>
