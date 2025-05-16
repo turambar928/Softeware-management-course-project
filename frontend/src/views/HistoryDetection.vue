@@ -425,30 +425,66 @@ const generateMockData = () => {
     '国际会议达成气候变化新协议，全球承诺减排',
     '新研究表明健康饮食习惯可显著降低心血管疾病风险',
     '技术公司宣布突破性人工智能研发，股价大涨',
+    '全球最大科技公司发布新一代AI芯片，性能提升300%',
+    '研究显示社交媒体使用与青少年抑郁症状呈正相关',
+    '新冠疫情后全球旅游业复苏，多国放宽入境限制',
+    '专家警告：深度伪造技术在政治宣传中的滥用日益严重',
+    '世界卫生组织发布最新健康指南，建议减少久坐时间',
+    '著名科学家质疑量子计算突破报道，称数据存在问题',
+    '全球变暖导致极端天气事件频发，多国遭遇严重洪灾',
+    '新研究发现海洋塑料污染已影响深海生态系统',
+    '国际空间站迎来首位私人宇航员，开启太空旅游新时代',
+    '人工智能在医疗诊断领域取得重大突破，准确率超过人类医生',
+    '全球芯片短缺持续影响汽车生产，多家厂商被迫减产',
+    '研究人员开发出新型可降解塑料，有望减轻环境负担',
+    '专家预测：元宇宙技术将在五年内彻底改变社交方式',
+    '世界首例猪心脏移植人类手术成功，为器官移植开辟新途径',
+    '最新调查显示远程工作模式将成为疫情后的新常态',
   ]
 
   // 生成分析因素
   const realFactors = [
-    { name: '内容一致性', description: '新闻内容与多个可靠源报道一致' },
-    { name: '来源可靠性', description: '新闻来源为知名可靠的新闻机构' },
-    { name: '事实核实', description: '关键事实可以通过多渠道验证' }
+    { name: '内容一致性', description: '新闻内容与多个可靠源报道一致，包括路透社、美联社等权威媒体的报道' },
+    { name: '来源可靠性', description: '新闻来源为知名可靠的新闻机构，具有良好的专业声誉和事实核查机制' },
+    { name: '事实核实', description: '关键事实可以通过多渠道验证，包括官方数据、专家证言和原始资料' },
+    { name: '时间一致性', description: '新闻中提及的时间线与实际事件发生时间匹配，无时间错乱或矛盾' },
+    { name: '引用准确性', description: '新闻中的引用和数据准确，与原始来源一致，无断章取义或更改' },
+    { name: '影像真实性', description: 'DeepFake检测系统未发现图像或视频的人工合成痕迹' }
   ]
 
   const fakeFactors = [
-    { name: '内容不一致', description: '新闻内容与已知事实有显著冲突' },
-    { name: '情绪化语言', description: '内容使用了过多的情绪化和极端语言' },
-    { name: '缺乏来源', description: '新闻未指明信息来源或引用不可靠源' }
+    { name: '内容不一致', description: '新闻内容与已知事实有显著冲突，多个关键细节与可靠源报道不符' },
+    { name: '情绪化语言', description: '内容使用了过多的情绪化和极端语言，旨在引发读者强烈情绪反应而非客观报道' },
+    { name: '缺乏来源', description: '新闻未指明信息来源或引用不可靠源，无法验证其真实性' },
+    { name: '逻辑矛盾', description: '新闻内容存在内部逻辑矛盾，多处说法自相矛盾或与常识不符' },
+    { name: '时间错误', description: '新闻中提及的时间线与实际事件发生时间不符，存在明显的时间错误' },
+    { name: 'DeepFake痕迹', description: '检测到图像或视频中存在人工智能生成或编辑的痕迹，如不自然的面部表情或背景异常' },
+    { name: '数据异常', description: '新闻中引用的数据存在异常，与官方统计或权威数据差距过大' }
   ]
 
-  // 生成模拟数据
-  for (let i = 0; i < 25; i++) {
-    const isReal = Math.random() > 0.3
-    const contentType = contentTypes[Math.floor(Math.random() * contentTypes.length)]
-    const content = contents[Math.floor(Math.random() * contents.length)]
+  // 生成模拟数据 - 确保多样性
+  // 先创建一个包含不同类型的数组
+  const dataTypes = [
+    { contentType: '图片新闻', isReal: true },
+    { contentType: '图片新闻', isReal: false },
+    { contentType: '文本新闻', isReal: true },
+    { contentType: '文本新闻', isReal: false },
+    { contentType: '网页新闻', isReal: true },
+    { contentType: '网页新闻', isReal: false }
+  ]
 
-    // 生成随机日期（过去30天内）
+  // 打乱数组顺序
+  dataTypes.sort(() => Math.random() - 0.5)
+
+  // 生成模拟数据
+  for (let i = 0; i < 6; i++) {
+    const { contentType, isReal } = dataTypes[i]
+    // 确保每条记录的内容都不同
+    const content = contents[i % contents.length]
+
+    // 生成有序日期，让最近的记录在前面
     const date = new Date()
-    date.setDate(date.getDate() - Math.floor(Math.random() * 30))
+    date.setDate(date.getDate() - i * 2) // 每两天一条记录，越近的越前
 
     mockData.push({
       id: i + 1,
@@ -458,11 +494,37 @@ const generateMockData = () => {
       isReal: isReal,
       result: isReal ? '真实' : '虚假',
       score: isReal ? 3.5 + Math.random() * 1.5 : 1 + Math.random() * 2,
-      picture_url: contentType === '图片新闻' ? 'https://via.placeholder.com/300x200' : null,
-      resultImage: Math.random() > 0.5 ? 'https://via.placeholder.com/500x300' : null,
+      picture_url: contentType === '图片新闻' ?
+        [
+          'https://via.placeholder.com/300x200/2c3e50/ffffff?text=新闻图片+1',
+          'https://via.placeholder.com/300x200/3498db/ffffff?text=新闻图片+2',
+          'https://via.placeholder.com/300x200/e74c3c/ffffff?text=新闻图片+3',
+          'https://via.placeholder.com/300x200/27ae60/ffffff?text=新闻图片+4',
+          'https://via.placeholder.com/300x200/f39c12/ffffff?text=新闻图片+5',
+          'https://via.placeholder.com/300x200/9b59b6/ffffff?text=新闻图片+6'
+        ][Math.floor(Math.random() * 6)] : null,
+      resultImage: Math.random() > 0.5 ?
+        [
+          'https://via.placeholder.com/500x300/2c3e50/ffffff?text=分析结果+1',
+          'https://via.placeholder.com/500x300/3498db/ffffff?text=分析结果+2',
+          'https://via.placeholder.com/500x300/e74c3c/ffffff?text=分析结果+3',
+          'https://via.placeholder.com/500x300/27ae60/ffffff?text=分析结果+4'
+        ][Math.floor(Math.random() * 4)] : null,
       summary: isReal ?
-        '经过多维度分析，该新闻内容大部分可信，与多个可靠源报道一致。' :
-        '经分析，该新闻内容存在多处不一致或误导性信息，可信度较低。',
+        [
+          '经过多维度分析，该新闻内容大部分可信，与多个可靠源报道一致。',
+          '经过DeepFake检测系统全面分析，该新闻内容的真实性得到了高度认可，各项关键指标均显示其可靠性。',
+          '综合分析表明，该新闻来源可靠，内容与实际事件匹配，无明显的人工合成或编辑痕迹。',
+          '经过系统全面检测，该新闻内容的事实陈述、数据引用和时间线均符合真实性标准，可信度高。',
+          '经过AI深度分析，该新闻内容的可靠性得到确认，其中包含的事实和数据与权威源一致。'
+        ][Math.floor(Math.random() * 5)] :
+        [
+          '经分析，该新闻内容存在多处不一致或误导性信息，可信度较低。',
+          'DeepFake检测系统发现该新闻存在多项可疑因素，包括内容矛盾、数据异常和可能的人工编辑痕迹。',
+          '系统检测到该新闻存在明显的真实性问题，包括与可靠源报道的重大差异和内部逻辑矛盾。',
+          '经过深度分析，该新闻内容存在多项可疑特征，包括过度情绪化语言、不准确的事实陈述和可能的人工操纵痕迹。',
+          '综合分析显示，该新闻内容的可信度极低，多项关键指标表明其可能是人工生成或深度编辑的内容。'
+        ][Math.floor(Math.random() * 5)],
       factors: isReal ? realFactors : fakeFactors
     })
   }
@@ -474,6 +536,15 @@ const generateMockData = () => {
 onMounted(async () => {
   try {
     const token = localStorage.getItem('token')
+
+    // 如果没有token，直接使用模拟数据
+    if (!token) {
+      console.log('没有登录token，直接使用模拟数据')
+      const mockData = generateMockData()
+      console.log('生成的模拟数据数量：', mockData.length)
+      detections.value = mockData
+      return
+    }
 
     // 尝试从后端获取数据
     try {
@@ -500,17 +571,41 @@ onMounted(async () => {
         }))
       } else {
         // 如果获取失败，使用模拟数据
-        detections.value = generateMockData()
+        console.log('使用模拟数据，因为API响应不成功')
+        const mockData = generateMockData()
+        console.log('生成的模拟数据数量：', mockData.length)
+        detections.value = mockData
       }
     } catch (error) {
       console.error('获取记录失败：', error)
       // 如果请求失败，使用模拟数据
-      detections.value = generateMockData()
+      console.log('使用模拟数据，因为API请求失败')
+      const mockData = generateMockData()
+      console.log('生成的模拟数据数量：', mockData.length)
+      detections.value = mockData
+
+      // 打印过滤后的数据
+      setTimeout(() => {
+        console.log('过滤后的数据数量：', filteredDetections.value.length)
+        console.log('分页后的数据数量：', paginatedDetections.value.length)
+      }, 500)
     }
   } catch (error) {
     console.error('初始化失败：', error)
     ElMessage.error('加载历史记录失败')
+
+    // 即使出错也尝试加载模拟数据
+    const mockData = generateMockData()
+    detections.value = mockData
   }
+
+  // 最后的安全检查，确保有数据显示
+  setTimeout(() => {
+    if (detections.value.length === 0) {
+      console.log('最终检查：数据仍然为空，强制加载模拟数据')
+      detections.value = generateMockData()
+    }
+  }, 1000)
 })
 
 // 监听过滤器变化
