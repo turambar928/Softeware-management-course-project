@@ -876,7 +876,8 @@ const handleLogout = () => {
 
 const formatTime = (timeStr) => {
   const date = new Date(timeStr)
-  return date.toLocaleString()
+  // 只返回日期部分，不返回时间
+  return date.toLocaleDateString()
 }
 
 // 生命周期钩子

@@ -17,51 +17,67 @@
       <div class="step-content">
         <!-- 第一步：上传内容 -->
         <div v-if="activeStep === 0" class="upload-step">
-          <el-tabs v-model="activeTab" class="detection-tabs">
-            <el-tab-pane label="图片检测" name="image">
-              <div class="upload-container">
-                <el-upload
-                  class="image-uploader"
-                  :auto-upload="false"
-                  :show-file-list="false"
-                  :on-change="handleImageChange"
-                  accept="image/*"
-                  drag
-                >
-                  <img v-if="imageUrl" :src="imageUrl" class="preview-img" />
-                  <el-icon v-else class="upload-icon"><Plus /></el-icon>
-                  <div v-if="!imageUrl" class="upload-text">
-                    <span>拖拽图片到此处或点击上传</span>
-                    <p class="upload-hint">支持 JPG, PNG 格式图片</p>
-                  </div>
-                </el-upload>
-              </div>
-            </el-tab-pane>
+          <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+          >
+            <template #title>
+              <strong>请同时上传新闻图片和输入新闻文本内容进行综合检测</strong>
+            </template>
+            <template #default>
+              <p>DeepFake检测系统需要同时分析图片和文本内容，以提供更准确的检测结果</p>
+            </template>
+          </el-alert>
 
-            <el-tab-pane label="文本检测" name="text">
-              <div class="text-container">
-                <el-input
-                  v-model="textInput"
-                  type="textarea"
-                  :rows="8"
-                  placeholder="请输入需要检测的新闻文本内容..."
-                  resize="none"
-                />
-                <p class="text-hint">请输入至少100个字的新闻内容以获得更准确的检测结果</p>
-              </div>
-            </el-tab-pane>
+          <el-divider content-position="center">图片上传</el-divider>
 
-            <el-tab-pane label="URL检测" name="url">
-              <div class="url-container">
-                <el-input
-                  v-model="urlInput"
-                  placeholder="请输入新闻文章的URL地址"
-                  prefix-icon="Link"
-                />
-                <p class="url-hint">输入新闻网页的完整URL，系统将自动提取内容进行分析</p>
+          <div class="upload-container">
+            <el-upload
+              class="image-uploader"
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="handleImageChange"
+              accept="image/*"
+              drag
+            >
+              <img v-if="imageUrl" :src="imageUrl" class="preview-img" />
+              <el-icon v-else class="upload-icon"><Plus /></el-icon>
+              <div v-if="!imageUrl" class="upload-text">
+                <span>拖拽图片到此处或点击上传</span>
+                <p class="upload-hint">支持 JPG, PNG 格式图片</p>
               </div>
-            </el-tab-pane>
-          </el-tabs>
+            </el-upload>
+            <div class="upload-status">
+              <el-tag v-if="selectedFile" type="success" effect="dark">
+                <el-icon><Check /></el-icon> 图片已上传
+              </el-tag>
+              <el-tag v-else type="danger" effect="dark">
+                <el-icon><Warning /></el-icon> 请上传图片
+              </el-tag>
+            </div>
+          </div>
+
+          <el-divider content-position="center">文本输入</el-divider>
+
+          <div class="text-container">
+            <el-input
+              v-model="textInput"
+              type="textarea"
+              :rows="8"
+              placeholder="请输入需要检测的新闻文本内容..."
+              resize="none"
+            />
+            <p class="text-hint">请输入至少100个字的新闻内容以获得更准确的检测结果</p>
+            <div class="text-status">
+              <el-tag v-if="textInput.trim().length >= 10" type="success" effect="dark">
+                <el-icon><Check /></el-icon> 文本已输入
+              </el-tag>
+              <el-tag v-else type="danger" effect="dark">
+                <el-icon><Warning /></el-icon> 请输入文本内容
+              </el-tag>
+            </div>
+          </div>
 
           <div class="action-buttons">
             <el-button type="primary" :disabled="!canProceed" @click="startDetection">
@@ -223,13 +239,11 @@ import axios from 'axios'
 
 // 基本状态
 const activeStep = ref(0) // 0: 上传内容, 1: 分析中, 2: 查看结果
-const activeTab = ref('image') // image, text, url
 const helpDialogVisible = ref(false)
 
 // 输入内容
 const imageUrl = ref('')
 const textInput = ref('')
-const urlInput = ref('')
 const selectedFile = ref(null)
 const resultImage = ref('')
 
@@ -258,10 +272,8 @@ const detectionResult = ref({
 
 // 计算属性
 const canProceed = computed(() => {
-  if (activeTab.value === 'image') return !!selectedFile.value
-  if (activeTab.value === 'text') return textInput.value.trim().length >= 10
-  if (activeTab.value === 'url') return isValidUrl(urlInput.value)
-  return false
+  // 同时要求有图片和文本
+  return !!selectedFile.value && textInput.value.trim().length >= 10
 })
 
 const credibilityColor = computed(() => {
@@ -281,19 +293,11 @@ const handleImageChange = (file) => {
   reader.readAsDataURL(file.raw)
 }
 
-const isValidUrl = (url) => {
-  try {
-    new URL(url)
-    return true
-  } catch (e) {
-    return false
-  }
-}
+
 
 const resetForm = () => {
   imageUrl.value = ''
   textInput.value = ''
-  urlInput.value = ''
   selectedFile.value = null
 }
 
@@ -343,13 +347,9 @@ const performActualDetection = async () => {
   try {
     const formData = new FormData()
 
-    if (activeTab.value === 'image' && selectedFile.value) {
-      formData.append('image', selectedFile.value)
-    } else if (activeTab.value === 'text') {
-      formData.append('text', textInput.value)
-    } else if (activeTab.value === 'url') {
-      formData.append('url', urlInput.value)
-    }
+    // 同时发送图片和文本数据
+    formData.append('image', selectedFile.value)
+    formData.append('text', textInput.value)
 
     const token = localStorage.getItem('token') || ''
 
@@ -497,9 +497,16 @@ onMounted(() => {
 }
 
 .upload-container,
-.text-container,
-.url-container {
+.text-container {
   padding: 20px 0;
+  margin-bottom: 20px;
+}
+
+.upload-status,
+.text-status {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
 }
 
 .image-uploader {
